@@ -21,10 +21,12 @@ def mqtt_message(client, userdata, msg):
 	try:
 		topic = msg.topic.replace('/', '.')
 		data = float(msg.payload)
+		graphite.send(topic, data)
 	except ValueError:
 		print('[!] can\'t convert {} to float'.format(msg.payload))
-	else:
-		graphite.send(topic, data)
+	except GraphiteSendException:
+		print('[!] can\'t send data to graphite\n    please implement an enterprise loop!')
+		exit(1)
 
 if __name__ == '__main__':
 	graphite = graphitesend.init(graphite_server=config['graphite_server'], prefix='', system_name='')
