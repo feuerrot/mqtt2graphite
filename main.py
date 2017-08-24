@@ -13,10 +13,12 @@ config = {
 graphite = None
 
 def mqtt_connect(client, userdata, flags, rc):
+	print('[ ] connected to mqtt server')
 	client.subscribe(config['mqtt_subscriptions'])
 
 def mqtt_message(client, userdata, msg):
-	graphite.send(msg.topic.replace('/', '.'), msg.payload)
+	print('[ ] received message - topic {} payload {}'.format(msg.topic, msg.payload))
+	graphite.send(msg.topic.replace('/', '.'), float(msg.payload))
 
 if __name__ == '__main__':
 	graphite = graphitesend.init(dryrun=True)
