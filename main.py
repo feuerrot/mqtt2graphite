@@ -8,6 +8,7 @@ config = {
 	'mqtt_subscriptions': [
 		('sensor/temperature/room', 1),
 	],
+	'graphite_server': 'localhost'
 }
 
 graphite = None
@@ -21,7 +22,7 @@ def mqtt_message(client, userdata, msg):
 	graphite.send(msg.topic.replace('/', '.'), float(msg.payload))
 
 if __name__ == '__main__':
-	graphite = graphitesend.init(dryrun=True)
+	graphite = graphitesend.init(graphite_server=config['graphite_server'], prefix='', system_name='')
 	mqtt = mqtt_client.Client()
 	mqtt.on_connect = mqtt_connect
 	mqtt.on_message = mqtt_message
