@@ -18,8 +18,13 @@ def mqtt_connect(client, userdata, flags, rc):
 	client.subscribe(config['mqtt_subscriptions'])
 
 def mqtt_message(client, userdata, msg):
-	print('[ ] received message - topic {} payload {}'.format(msg.topic, msg.payload))
-	graphite.send(msg.topic.replace('/', '.'), float(msg.payload))
+	try:
+		topic = msg.topic.replace('/', '.')
+		data = float(msg.payload)
+	except ValueError:
+		print('[!] can\'t convert {} to float'.format(msg.payload))
+	else:
+		graphite.send(topic, data)
 
 if __name__ == '__main__':
 	graphite = graphitesend.init(graphite_server=config['graphite_server'], prefix='', system_name='')
