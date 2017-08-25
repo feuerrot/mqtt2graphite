@@ -7,8 +7,13 @@ config = {
 	'mqtt_port': 1883,
 	'mqtt_subscriptions': [
 		('sensor/temperature/room', 1),
+		('sensor/28ff1ec760160328/temperature', 1),
 	],
 	'graphite_server': 'localhost'
+}
+
+translate = {
+	'sensor/28ff1ec760160328/temperature': 'sensor/temperature/bathroom'
 }
 
 graphite = None
@@ -18,6 +23,8 @@ def mqtt_connect(client, userdata, flags, rc):
 	client.subscribe(config['mqtt_subscriptions'])
 
 def mqtt_message(client, userdata, msg):
+	if msg.topic in translate:
+		msg.topic = translate[msg.topic].encode('utf-8')
 	try:
 		topic = msg.topic.replace('/', '.')
 		data = float(msg.payload)
